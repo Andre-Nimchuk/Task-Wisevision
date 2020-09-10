@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+  <div id="main">
+    <div class="form">
+      <input type="text" id="input_value">
+      <span id="result"></span>
+    </div>
+    <div class="repo_wrapper">
+
+      <table class='table table--lg team-roster-table table-hover'>
+        <tbody>
+          <tr v-for="(p, index) of repo" class="tr">
+            <td class='team-roster-table__name'>{{p.name}}</td>
+            <td class='team-roster-table__name'>{{p.id}}</td>
+            <td class='team-roster-table__name'>{{p.full_name}}</td>
+            <td class='team-roster-table__name'><input type="button" class="addTo" @click="addToLocalStorage(index)"
+                value="TAKE"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</body>
+
+</html>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"></script>
+
+<script>
+  new Vue({
+    el: '#main',
+    data: {
+      repo: '',
+      data_array: [],
+      inp_val: '',
+      name: 'name',
+    },
+    methods: {
+      addToLocalStorage: (index) => {
+        let but = document.getElementsByClassName('addTo')[index].parentElement
+        localStorage.setItem('repo',JSON.stringify(but)) //Never dealt with localhost, tried to do as I understood.
+        var res = []
+        res = JSON.parse(localStorage.getItem('repo'))
+        var let = res
+        console.log(let) 
+
+      }
+    },
+    mounted() {
+      let input = document.getElementById('input_value')
+      let val = ''
+      let UrL = ''
+      input.oninput = (t) => { //wrote all the code in the event handler onimput
+        var t = this
+        t = val.innerHTML = input.value;
+
+        UrL = 'https://api.github.com/search/repositories?q=' + t
+        console.log(UrL)
+        axios.get(UrL,
+          this.data,
+          {
+            headers: {
+              "Accept": "application/json",
+              "Access-Control-Allow-Origin": "*",
+              "X-Requested-With": "XMLHttpRequest",
+              "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+              "Access-Control-Allow-Headers": "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With"
+            }
+          }
+        ).then(response => {
+          let dt = response.data.items;
+
+          this.data_array = dt;
+        })
+          .finally(() => (this.repo = this.data_array))
+      }
+    }
+  })
+  
+</script>
